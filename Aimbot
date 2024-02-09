@@ -1,0 +1,93 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local window = script.Parent
+local toggleButton = window:WaitForChild("ToggleButton")
+local aimbotEnabled = false
+local espEnabled = false
+
+local function getClosestPlayer()
+    local closestDistance = math.huge
+    local closestPlayer
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= player then
+            local character = player.Character
+
+            if character then
+                local humanoid = character:WaitForChild("Humanoid")
+                local rootPart = character:WaitForChild("HumanoidRootPart")
+                local distance = (rootPart.Position - humanoid.TargetPoint).magnitude
+
+                if distance < closestDistance then
+                    closestDistance = distance
+                    closestPlayer = player
+                end
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+local function aimbot()
+    if aimbotEnabled then
+        local closestPlayer = getClosestPlayer()
+
+        if closestPlayer then
+            local character = closestPlayer.Character
+
+            if character then
+                local humanoid = character:WaitForChild("Humanoid")
+                local rootPart = character:WaitForChild("HumanoidRootPart")
+
+                humanoid.TargetPoint = rootPart.Position
+            end
+        end
+    end
+end
+
+local function esp()
+    if espEnabled then
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= player then
+                local character = player.Character
+
+                if character then
+                    local rootPart = character:WaitForChild("HumanoidRootPart")
+                    local distance = (rootPart.Position - player.Character.Head.Position).magnitude
+
+                    local textLabel = Instance.new("TextLabel")
+                    textLabel.Parent = game.CoreGui
+                    textLabel.BackgroundTransparency = 1
+                    textLabel.Text = player.Name .. " (" .. math.floor(distance) .. ")"
+                    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    textLabel.Font = Enum.Font.SourceSans
+                    textLabel.FontSize = Enum.FontSize.Size14
+                    textLabel.Position = UDim2.new(0, rootPart.Position.X, 0, rootPart.Position.Y, 0, 0)
+                end
+            end
+        end
+    end
+end
+
+toggleButton.MouseButton1Click:Connect(function()
+    aimbotEnabled = not aimbotEnabled
+    espEnabled = not espEnabled
+
+    if aimbotEnabled then
+        toggleButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    else
+        toggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    aimbot()
+    esp()
+end)
