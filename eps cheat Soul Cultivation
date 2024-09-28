@@ -1,0 +1,58 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local treasuresFound = {}
+
+-- ฟังก์ชันสำหรับสร้าง Highlight และ Beam
+local function createESP(treasure)
+    local highlight = Instance.new("Highlight", treasure)
+    highlight.FillColor = Color3.fromRGB(255, 0, 0) -- สีแดง
+    highlight.OutlineColor = Color3.fromRGB(255, 255, 0) -- สีเหลือง
+    highlight.FillTransparency = 0.5
+    highlight.OutlineTransparency = 0
+
+    local beam = Instance.new("Beam", treasure)
+    beam.Width0 = 0.1
+    beam.Width1 = 0.1
+    beam.Color = ColorSequence.new(Color3.fromRGB(0, 255, 0)) -- สีเขียว
+
+    -- ตรวจสอบ Part แรกในโมเดลเพื่อสร้าง Attachments
+    local firstPart = treasure:FindFirstChildWhichIsA("Part")
+    if firstPart then
+        local attachmentTreasure = Instance.new("Attachment", firstPart)
+        attachmentTreasure.Position = Vector3.new(0, 0, 0) -- ตำแหน่งของสมบัติ
+
+        local attachmentPlayer = Instance.new("Attachment", humanoidRootPart)
+        attachmentPlayer.Position = Vector3.new(0, 2, 0) -- ตำแหน่งผู้เล่น
+
+        beam.Attachment0 = attachmentTreasure
+        beam.Attachment1 = attachmentPlayer
+    end
+end
+
+-- รายชื่อสมบัติที่ต้องการตรวจสอบ
+local treasureNames = {
+    "Very Rare Treasure 1",
+    "Very Rare Treasure 2",
+    "Very Rare Treasure 3",
+    "Very Rare Treasure 4",
+    "Lost Treasure 1",
+    "Lost Treasure 2"
+}
+
+-- ฟังก์ชันสำหรับตรวจสอบและสร้าง ESP
+local function checkTreasures()
+    for _, treasure in pairs(workspace.Treasures:GetChildren()) do
+        if treasure:IsA("Model") and table.find(treasureNames, treasure.Name) then
+            createESP(treasure)
+            table.insert(treasuresFound, treasure.Name)
+            print("Found: " .. treasure.Name)
+        end
+    end
+end
+
+-- เรียกใช้งานฟังก์ชัน
+checkTreasures()
+
+-- แสดงผลรวมของสมบัติที่พบ
+print("Total treasures found: " .. #treasuresFound)
