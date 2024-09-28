@@ -2,7 +2,6 @@ local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local treasuresFound = {}
-local maxTreasures = 6 -- จำนวนสมบัติทั้งหมดที่คาดว่าจะเจอ
 
 -- ฟังก์ชันสำหรับสร้าง Highlight และ Beam
 local function createESP(treasure)
@@ -58,13 +57,13 @@ checkTreasures()
 -- แสดงผลรวมของสมบัติที่พบ
 print("Total treasures found: " .. #treasuresFound)
 
--- ฟังก์ชันสำหรับ Server Hop เมื่อเจอสมบัติครบ
+-- ฟังก์ชันสำหรับ Server Hop เมื่อไม่เจอสมบัติ
 local TeleportService = game:GetService("TeleportService")
-local PlaceId = 13086786145 -- Place ID ที่คุณให้มา
+local PlaceId = 13086786145 -- ใช้ Place ID ที่ให้มา
 
--- ถ้าเจอสมบัติทั้งหมดแล้ว ให้ทำการเปลี่ยนเซิร์ฟเวอร์
-if #treasuresFound >= maxTreasures then
-    print("All treasures collected. Hopping to a new server...")
-    -- ใช้ TeleportService เพื่อเปลี่ยนไปยังเซิร์ฟเวอร์ใหม่โดยไม่ต้องระบุ instanceId
-    TeleportService:Teleport(PlaceId, player)
+-- ถ้าไม่เจอสมบัติใด ๆ ให้ทำการเปลี่ยนเซิร์ฟเวอร์
+if #treasuresFound == 0 then
+    print("No treasures found. Hopping to a new server...")
+    -- ใช้ TeleportService เพื่อเปลี่ยนไปยังเซิร์ฟเวอร์ใหม่
+    TeleportService:TeleportToPlaceInstance(PlaceId, "", player)
 end
